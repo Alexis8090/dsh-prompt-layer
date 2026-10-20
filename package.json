@@ -1,6 +1,6 @@
 {
   "name": "dsh-prompt-layer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Add a configurable section to the DeepSeek Harness system prompt, rendered after every built-in section.",
   "type": "module",
   "main": "lib/index.js",
