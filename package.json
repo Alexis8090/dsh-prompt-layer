@@ -1,0 +1,42 @@
+{
+  "name": "dsh-prompt-layer",
+  "version": "1.0.0",
+  "description": "Add a configurable section to the DeepSeek Harness system prompt, rendered after every built-in section.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "system-prompt",
+    "agents-md",
+    "prompt-engineering"
+  ],
+  "license": "MIT",
+  "author": "AtinyFurina",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AtinyFurina/dsh-prompt-layer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AtinyFurina/dsh-prompt-layer/issues"
+  },
+  "homepage": "https://github.com/AtinyFurina/dsh-prompt-layer#readme"
+}
