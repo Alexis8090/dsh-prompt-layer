@@ -16,7 +16,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "verify": "node verify.mjs"
   },
   "engines": {
     "node": ">=20"

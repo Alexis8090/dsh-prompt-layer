@@ -71,6 +71,7 @@ apply(ctx, { text, sectionName, order: DEFAULT_ORDER })
 const assembly = await ctx.systemPrompt.assemble()
 const rendered = renderPrompt(assembly)
 const last = assembly.sections.at(-1)
+const hostBase = ctx.systemPrompt.getSectionOrder?.('DEPLOYMENT_PERSONA_SUFFIX')
 
 let failures = 0
 function check(label, condition, extra = '') {
@@ -82,10 +83,27 @@ check('section registered', assembly.sections.some((section) => section.name ===
 check('section renders last', last?.name === sectionName, `last=${last?.name}`)
 check('rendered prompt contains the text', rendered.includes(text))
 check('rendered prompt ends with the text', rendered.trimEnd().endsWith(text))
-check('order is above the host maximum', DEFAULT_ORDER > 10200, `order=${DEFAULT_ORDER}`)
+check(
+  'order is above the host base',
+  typeof hostBase === 'number' && DEFAULT_ORDER > hostBase,
+  `order=${DEFAULT_ORDER} hostBase=${hostBase}`,
+)
+
+// Regression: a run of opening braces must not break prompt assembly.
+const braceCtx = new Context()
+new SystemPrompt(braceCtx, {})
+apply(braceCtx, { text: 'template: {{{{name}}}}', sectionName: 'deploy:brace-regression' })
+let braceOk = true
+try {
+  renderPrompt(await braceCtx.systemPrompt.assemble())
+} catch {
+  braceOk = false
+}
+check('brace run does not break assembly', braceOk)
 
 console.log('\nsections seen by the registry:')
-for (const section of assembly.sections) console.log(`  ${section.order}\t${section.name}`)
+for (const section of assembly.sections) console.log(`  ${section.name}`)
+console.log(`\nhost base (DEPLOYMENT_PERSONA_SUFFIX) = ${hostBase}`)
 
 assert.equal(failures, 0, `${failures} verification(s) failed`)
 console.log('\nOK: dsh-prompt-layer renders after every built-in section.')

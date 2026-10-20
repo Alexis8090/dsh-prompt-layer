@@ -140,3 +140,32 @@ test('apply escapes braces in the registered text', () => {
   assert.equal(ctx.sections[0].text.includes('{{'), false)
   assert.ok(ctx.warnings.some((message) => message.includes('escaped')))
 })
+
+test('escapes a run of three or more opening braces', () => {
+  for (const input of ['{{a}}', '{{{a}}}', '{{{{a}}}}', '{{ a }}', '{{a}{b}}']) {
+    const { text } = escapeVariableBraces(input)
+    assert.equal(text.includes('{{'), false, input)
+  }
+})
+
+test('apply escapes brace runs before registering', () => {
+  const ctx = createCtx()
+  apply(ctx, { text: 'example: {{{{name}}}}' })
+
+  assert.equal(ctx.sections[0].text.includes('{{'), false)
+})
+
+test('warns when order is not above the host last section', () => {
+  const ctx = createCtx()
+  apply(ctx, { text: 'x', order: 500 })
+
+  assert.ok(ctx.warnings.some((message) => message.includes('not above')))
+})
+
+test('derives the default order from the host base when available', () => {
+  const ctx = createCtx()
+  ctx.systemPrompt.getSectionOrder = () => 10250
+  apply(ctx, { text: 'x' })
+
+  assert.equal(ctx.sections[0].order, 10550)
+})

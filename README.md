@@ -19,7 +19,7 @@
 
 也就是说：写在 `AGENTS.md` 里的"以本文件为准"是自赋优先级，会被承载它的那条 user 消息的信封当场否掉。要让部署方自己的策略真正落到高优先级，得把它放进**系统提示词层**。
 
-本插件把段落序设为 `10500`；DSH 本体给 persona 分配的最大段落序是 `DEPLOYMENT_PERSONA_SUFFIX = 10200`。更大的 order 意味着**渲染在系统提示词最末位**——模型读到的最后一段文字。
+本插件默认把段落序设为宿主最后一段（`DEPLOYMENT_PERSONA_SUFFIX`，当前 `10200`）+ 300 = `10500`。更大的 order 意味着渲染在**系统提示词内部的末位**（系统消息本身仍排在对话最前，工作区指令作为后续 user 消息在其之后）。
 
 > 这是一套通用机制，不是某个场景的专用开关。文案内容由部署方自己负责。
 
@@ -58,7 +58,7 @@
 | `enabled` | boolean | `true` | 设为 `false` 可临时停用，不必卸载 |
 | `text` | string | — | 内联文案 |
 | `textFile` | string | — | UTF-8 文件路径；**优先于 `text`**。相对路径按 DSH 进程的工作目录解析，建议用绝对路径 |
-| `order` | number | `10500` | 渲染顺序，越大越靠后 |
+| `order` | number | 宿主 `DEPLOYMENT_PERSONA_SUFFIX` + 300（当前 `10500`） | 渲染顺序，越大越靠后；低于宿主基准会告警 |
 | `sectionName` | string | `deploy:custom-layer` | 出现在宿主诊断里的段落名 |
 
 行为细节：
@@ -82,7 +82,8 @@ npm test
 
 ```bash
 # DSH 的包不在本仓库 node_modules 里，指向 profile 的 node_modules
-node verify.mjs --modules "C:\Users\<you>\.dsh\profiles\node_modules"
+npm run verify -- --modules "C:\Users\<you>\.dsh\profiles\node_modules"
+# 等价的直接调用：node verify.mjs --modules "..."
 ```
 
 期望输出里能看到：
@@ -96,7 +97,9 @@ OK: dsh-prompt-layer renders after every built-in section.
 
 ## 兼容性
 
-- DSH `0.2.0-rc.2`、`0.2.1-rc.2`：实测存在 `ctx.systemPrompt.section()` 与 `DEPLOYMENT_PERSONA_SUFFIX = 10200`。
+- App 打包：`dsh-system-prompt 0.2.1-rc.2`；profile 解析：`0.1.5-rc.2`。
+- 两份源码的 `section()` / `SECTION_ORDERS`（`DEPLOYMENT_PERSONA_SUFFIX = 10200`）/ `interpolate()` 一致。
+- `verify.mjs --modules` 默认指向 profile 那份；要与 App 实际运行版本对齐需另行指定 App 内的模块路径。
 - Node.js `>= 20`。
 - 无第三方运行时依赖。
 
