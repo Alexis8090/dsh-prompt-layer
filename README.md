@@ -1,5 +1,8 @@
 # dsh-prompt-layer
 
+[![ci](https://github.com/AtinyFurina/dsh-prompt-layer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AtinyFurina/dsh-prompt-layer/actions/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 给 DeepSeek Harness 加一段**可配置的系统提示词段落**，渲染在所有内置段落之后。
 
 它自己不含任何策略文案：写什么由部署方通过 `config.text` 或 `textFile` 提供。
